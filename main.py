@@ -9,6 +9,7 @@ ChainDocs FastAPI backend
 from __future__ import annotations
 
 import os
+from pathlib import Path
 from typing import List
 
 import requests
@@ -19,6 +20,8 @@ from pydantic import BaseModel
 from qdrant_client import QdrantClient
 from sentence_transformers import SentenceTransformer
 from llama_cpp import Llama
+
+BASE_DIR = Path(__file__).resolve().parent
 
 # --------------------------------------------------------------------------- #
 #  Init FastAPI app & static hosting
@@ -58,7 +61,7 @@ class AskResponse(BaseModel):
 @app.get("/")
 async def spa() -> FileResponse:
     """Serve the HTML chat UI."""
-    return FileResponse("index.html")
+    return FileResponse(BASE_DIR / "index.html")
 
 
 @app.post("/ask", response_model=AskResponse)
