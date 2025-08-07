@@ -15,6 +15,8 @@ from llama_cpp import Llama
 
 # main.py
 from fastapi import FastAPI, Query
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, PointStruct, VectorParams
@@ -26,6 +28,7 @@ from langchain.chains import LLMChain
 
 
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
  codex/implement-real-/ask-functionality-in-main.py
@@ -95,10 +98,15 @@ chain = LLMChain(prompt=prompt, llm=llm)
 
 
 @app.get("/")
+ codex/implement-real-/ask-functionality-in-main.py
 def root():
     """Simple heartbeat endpoint."""
 
     return {"status": "ChainDocs API is alive!"}
+
+async def spa():
+    return FileResponse("index.html")
+ main
 
 
  codex/implement-real-/ask-functionality-in-main.py
@@ -183,4 +191,12 @@ def ask(question: str = Query(..., description="Question to ask the knowledge ba
     answer = chain.invoke({"context": context, "question": question})["text"]
     return {"answer": answer, "context": context}
 
+ codex/implement-real-/ask-functionality-in-main.py
 main
+
+
+@app.get("/health")
+def health():
+    return {"status": "ChainDocs API is alive!"}
+
+ main
