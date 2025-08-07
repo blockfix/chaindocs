@@ -20,14 +20,22 @@ from pydantic import BaseModel
 from qdrant_client import QdrantClient
 from sentence_transformers import SentenceTransformer
 from llama_cpp import Llama
+from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
 
 # --------------------------------------------------------------------------- #
 #  Init FastAPI app & static hosting
 # --------------------------------------------------------------------------- #
+ROOT = Path(__file__).resolve().parent
+
 app = FastAPI()
+ codex/import-pathlib-and-update-static-files
+app.mount("/static", StaticFiles(directory=ROOT / "static"), name="static")
+
 app.mount("/static", StaticFiles(directory="static"), name="static")
+INDEX_PATH = Path(__file__).resolve().parent / "index.html"
+ main
 
 # --------------------------------------------------------------------------- #
 #  Global models / clients
@@ -61,7 +69,15 @@ class AskResponse(BaseModel):
 @app.get("/")
 async def spa() -> FileResponse:
     """Serve the HTML chat UI."""
+ zap49k-codex/update-fileresponse-path-in-main.py
     return FileResponse(BASE_DIR / "index.html")
+
+ codex/import-pathlib-and-update-static-files
+    return FileResponse(ROOT / "index.html")
+
+    return FileResponse(INDEX_PATH)
+ main
+ main
 
 
 @app.post("/ask", response_model=AskResponse)
