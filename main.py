@@ -22,6 +22,8 @@ from sentence_transformers import SentenceTransformer
 from llama_cpp import Llama
 from pathlib import Path
 
+BASE_DIR = Path(__file__).resolve().parent
+
 # --------------------------------------------------------------------------- #
 #  Init FastAPI app & static hosting
 # --------------------------------------------------------------------------- #
@@ -67,10 +69,14 @@ class AskResponse(BaseModel):
 @app.get("/")
 async def spa() -> FileResponse:
     """Serve the HTML chat UI."""
+ zap49k-codex/update-fileresponse-path-in-main.py
+    return FileResponse(BASE_DIR / "index.html")
+
  codex/import-pathlib-and-update-static-files
     return FileResponse(ROOT / "index.html")
 
     return FileResponse(INDEX_PATH)
+ main
  main
 
 
