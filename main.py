@@ -1,5 +1,7 @@
 # main.py
 from fastapi import FastAPI, Query
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, PointStruct, VectorParams
@@ -10,6 +12,7 @@ from langchain.chains import LLMChain
 
 
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 # Set up embedding model and in-memory vector store
@@ -51,8 +54,8 @@ chain = LLMChain(prompt=prompt, llm=llm)
 
 
 @app.get("/")
-def root():
-    return {"status": "ChainDocs API is alive!"}
+async def spa():
+    return FileResponse("index.html")
 
 
 @app.get("/ask")
@@ -64,4 +67,9 @@ def ask(question: str = Query(..., description="Question to ask the knowledge ba
     context = result[0].payload["text"] if result else ""
     answer = chain.invoke({"context": context, "question": question})["text"]
     return {"answer": answer, "context": context}
+
+
+@app.get("/health")
+def health():
+    return {"status": "ChainDocs API is alive!"}
 
