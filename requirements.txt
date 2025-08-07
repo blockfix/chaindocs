@@ -1,3 +1,9 @@
+ codex/add-cli-to-extend-crawler.py-for-embed-push
+fastapi
+uvicorn[standard]
+qdrant-client
+sentence-transformers
+
 fastapi==0.115.14
 uvicorn[standard]==0.34.3
 scrapy==2.12.0
@@ -9,4 +15,8 @@ langchain==0.2.17
 llama-cpp-python==0.2.90
 python-dotenv==1.0.1
 pytest==8.3.5
+ codex/add-cli-to-extend-crawler.py-for-embed-push
+ main
+
 requests==2.32.3
+ main
