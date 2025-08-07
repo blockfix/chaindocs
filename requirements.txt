@@ -1,4 +1,18 @@
+ codex/add-cli-to-extend-crawler.py-for-embed-push
 fastapi
 uvicorn[standard]
 qdrant-client
 sentence-transformers
+
+fastapi==0.115.14
+uvicorn[standard]==0.34.3
+scrapy==2.12.0
+beautifulsoup4==4.12.3
+markdownify==0.11.6
+sentence-transformers==5.0.0
+qdrant-client==1.14.3
+langchain==0.2.17
+llama-cpp-python==0.2.90
+python-dotenv==1.0.1
+pytest==8.3.5
+ main
