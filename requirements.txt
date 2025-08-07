@@ -1,4 +1,3 @@
- codex/add-cli-to-extend-crawler.py-for-embed-push
 fastapi
 uvicorn[standard]
 qdrant-client
