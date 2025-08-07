@@ -9,6 +9,7 @@ ChainDocs FastAPI backend
 from __future__ import annotations
 
 import os
+from pathlib import Path
 from typing import List
 
 import requests
@@ -27,7 +28,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 
 app = FastAPI()
+ codex/import-pathlib-and-update-static-files
 app.mount("/static", StaticFiles(directory=ROOT / "static"), name="static")
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
+INDEX_PATH = Path(__file__).resolve().parent / "index.html"
+ main
 
 # --------------------------------------------------------------------------- #
 #  Global models / clients
@@ -61,7 +67,11 @@ class AskResponse(BaseModel):
 @app.get("/")
 async def spa() -> FileResponse:
     """Serve the HTML chat UI."""
+ codex/import-pathlib-and-update-static-files
     return FileResponse(ROOT / "index.html")
+
+    return FileResponse(INDEX_PATH)
+ main
 
 
 @app.post("/ask", response_model=AskResponse)
