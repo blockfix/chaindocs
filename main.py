@@ -9,6 +9,7 @@ ChainDocs FastAPI backend
 from __future__ import annotations
 
 import os
+from pathlib import Path
 from typing import List
 
 import requests
@@ -25,6 +26,7 @@ from llama_cpp import Llama
 # --------------------------------------------------------------------------- #
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
+INDEX_PATH = Path(__file__).resolve().parent / "index.html"
 
 # --------------------------------------------------------------------------- #
 #  Global models / clients
@@ -58,7 +60,7 @@ class AskResponse(BaseModel):
 @app.get("/")
 async def spa() -> FileResponse:
     """Serve the HTML chat UI."""
-    return FileResponse("index.html")
+    return FileResponse(INDEX_PATH)
 
 
 @app.post("/ask", response_model=AskResponse)

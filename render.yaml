@@ -2,6 +2,12 @@ services:
   - type: web
     name: chaindocs
     env: python
+ codex/update-deployment-settings-for-service
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     rootDir: .
+
+    rootDir: .
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn main:app --host 0.0.0.0 --port $PORT"
+ main
