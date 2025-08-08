@@ -20,8 +20,14 @@ form.addEventListener('submit', async (e) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ query: text })
     });
-    const data = await response.json();
-    assistantEl.innerHTML = marked.parse(data.answer || '');
+    if (response.ok) {
+      const data = await response.json();
+      assistantEl.innerHTML = DOMPurify.sanitize(
+        marked.parse(data.answer || '')
+      );
+    } else {
+      assistantEl.textContent = `Error: ${response.status} ${response.statusText}`;
+    }
   } catch (err) {
     assistantEl.textContent = 'Error fetching response.';
   }
