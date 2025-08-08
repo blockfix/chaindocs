@@ -15,6 +15,7 @@ The API expects a Qdrant vector database for retrieval. Configure it with:
 - `QDRANT_URL` – URL of your Qdrant service.
 - `QDRANT_API_KEY` – API key for that service.
 - `QDRANT_COLLECTION` – collection name (defaults to `chaindocs`).
+- `HEALTH_STATUS_MSG` – message returned by `/health` (defaults to `ChainDocs API is alive!`).
 
 Leaving `QDRANT_URL` or `QDRANT_API_KEY` unset will disable Qdrant integration; in
 that case the `/ask` endpoint responds with an error indicating the missing
