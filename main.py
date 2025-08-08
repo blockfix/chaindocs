@@ -10,7 +10,8 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import List
+from typing import List, Optional
+from urllib.parse import urlparse
 
 import requests
 from fastapi import FastAPI, HTTPException
@@ -20,9 +21,6 @@ from pydantic import BaseModel
 from qdrant_client import QdrantClient
 from sentence_transformers import SentenceTransformer
 from llama_cpp import Llama
-from pathlib import Path
-
-BASE_DIR = Path(__file__).resolve().parent
 
 # --------------------------------------------------------------------------- #
 #  Init FastAPI app & static hosting
@@ -30,12 +28,8 @@ BASE_DIR = Path(__file__).resolve().parent
 ROOT = Path(__file__).resolve().parent
 
 app = FastAPI()
- codex/import-pathlib-and-update-static-files
 app.mount("/static", StaticFiles(directory=ROOT / "static"), name="static")
-
-app.mount("/static", StaticFiles(directory="static"), name="static")
-INDEX_PATH = Path(__file__).resolve().parent / "index.html"
- main
+INDEX_PATH = ROOT / "index.html"
 
 # --------------------------------------------------------------------------- #
 #  Global models / clients
@@ -46,7 +40,21 @@ QDRANT_URL = os.getenv("QDRANT_URL")
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
 QDRANT_COLLECTION = os.getenv("QDRANT_COLLECTION", "chaindocs")
 
-qdrant = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY)
+
+def _is_valid_url(url: str) -> bool:
+    try:
+        parsed = urlparse(url)
+        return bool(parsed.scheme) and bool(parsed.netloc)
+    except Exception:
+        return False
+
+
+qdrant: Optional[QdrantClient] = None
+if QDRANT_URL and QDRANT_API_KEY and _is_valid_url(QDRANT_URL):
+    try:
+        qdrant = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY)
+    except Exception:
+        qdrant = None
 
 MODEL_PATH = "models/llama-2-7b-q4.bin"  # local llama.cpp model
 TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")  # fallback key
@@ -69,15 +77,7 @@ class AskResponse(BaseModel):
 @app.get("/")
 async def spa() -> FileResponse:
     """Serve the HTML chat UI."""
- zap49k-codex/update-fileresponse-path-in-main.py
-    return FileResponse(BASE_DIR / "index.html")
-
- codex/import-pathlib-and-update-static-files
-    return FileResponse(ROOT / "index.html")
-
     return FileResponse(INDEX_PATH)
- main
- main
 
 
 @app.post("/ask", response_model=AskResponse)
@@ -87,14 +87,23 @@ def ask(req: AskRequest) -> AskResponse:
     if not query:
         raise HTTPException(status_code=400, detail="Query is empty")
 
+    if qdrant is None:
+        raise HTTPException(
+            status_code=500,
+            detail="Qdrant is not configured. Set QDRANT_URL and QDRANT_API_KEY.",
+        )
+
     # 1. Embed query & vector-search Qdrant
     query_vec = EMBEDDER.encode(query).tolist()
-    hits = qdrant.search(
-        collection_name=QDRANT_COLLECTION,
-        query_vector=query_vec,
-        limit=5,
-        with_payload=True,
-    )
+    try:
+        hits = qdrant.search(
+            collection_name=QDRANT_COLLECTION,
+            query_vector=query_vec,
+            limit=5,
+            with_payload=True,
+        )
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Qdrant search failed: {exc}")
 
     context_chunks, sources = [], []
     for hit in hits:
