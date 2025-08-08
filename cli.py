@@ -14,6 +14,7 @@ import sys
 from typing import List
 
 import requests
+from urllib.parse import urljoin
 
 DEFAULT_HOST = "http://localhost:8000"  # override with --host for Render URL
 
@@ -35,11 +36,11 @@ def main() -> None:
         help="Base URL for the ChainDocs API (default: %(default)s)"
     )
     args = parser.parse_args()
+    host = args.host.rstrip('/')
 
     try:
-        resp = requests.post(
-            f"{args.host}/ask", json={"query": args.query}, timeout=60
-        )
+        ask_url = urljoin(host + '/', 'ask')
+        resp = requests.post(ask_url, json={"query": args.query}, timeout=60)
         resp.raise_for_status()
         data = resp.json()
 
