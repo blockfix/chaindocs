@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import threading
 from pathlib import Path
 from typing import List, Tuple
 
@@ -27,6 +28,9 @@ QDRANT_COLLECTION = os.getenv("QDRANT_COLLECTION", "chaindocs")
 
 TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
 MODEL_PATH = "models/llama-2-7b-q4.bin"
+
+llm: Llama | None = None
+llm_lock = threading.Lock()
 
 qdrant: QdrantClient | None = None
 if QDRANT_URL and QDRANT_API_KEY:
@@ -78,9 +82,9 @@ def _search_qdrant(query_vec: List[float]) -> Tuple[List[str], List[str]]:
 
 def _answer_with_llm(prompt: str) -> str:
     """Try local llama.cpp first; fall back to Together AI."""
-    if os.path.exists(MODEL_PATH):
-        llm = Llama(model_path=MODEL_PATH, n_ctx=4096)
-        out = llm(prompt, max_tokens=512, stop=["</s>"])
+    if llm:
+        with llm_lock:
+            out = llm(prompt, max_tokens=512, stop=["</s>"])
         return out["choices"][0]["text"].strip()
 
     if not TOGETHER_API_KEY:
@@ -123,6 +127,12 @@ async def ask(req: Request):
     query = await _get_query(req)
     if not query:
         raise HTTPException(status_code=400, detail="Query is empty")
+
+    global llm
+    if llm is None and os.path.exists(MODEL_PATH):
+        with llm_lock:
+            if llm is None:
+                llm = Llama(model_path=MODEL_PATH, n_ctx=4096)
 
     # Embed & retrieve
     query_vec = EMBEDDER.encode(query).tolist()
