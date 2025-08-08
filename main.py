@@ -162,10 +162,13 @@ async def ask(req: Request):
     return JSONResponse({"answer": answer, "sources": sources})
 
 
+HEALTH_STATUS_MSG = os.getenv("HEALTH_STATUS_MSG", "ChainDocs API is alive!")
+
+
 @app.get("/health")
 def health():
     return {
-        "status": "ChainDocs API is alive!",
+        "status": HEALTH_STATUS_MSG,
         "embedder": EMBED_MODEL_NAME,
         "qdrant_configured": bool(qdrant),
         "collection": QDRANT_COLLECTION,
